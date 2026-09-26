@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { usePlan } from "@/context/PlanContext";
 
-export default function MyPlanPage() {
+function MyPlanContent() {
   const { plan, saved, removeFromPlan, toggleSaved } = usePlan();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -253,5 +253,13 @@ export default function MyPlanPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function MyPlanPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-white text-sm">Loading plan...</div>}>
+      <MyPlanContent />
+    </Suspense>
   );
 }
