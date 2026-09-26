@@ -32,13 +32,16 @@ export default function WorkoutDetailPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  // 1. Updated handler enforcing the 5-lift cap
   const handleAddToPlan = () => {
     if (plan.length >= 5) {
-      triggerToast("Daily plan limit reached (max 5 lifts)!");
+      triggerToast("Cap reached: Maximum 5 lifts allowed for today!");
       return;
     }
-    addToPlan(workout);
-    triggerToast("Added to today's plan");
+    const success = addToPlan(workout);
+    if (success) {
+      triggerToast("Added to today's plan");
+    }
   };
 
   const handleSaveForLater = () => {
@@ -118,12 +121,19 @@ export default function WorkoutDetailPage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
+            {/* 2. Dynamic 5-Lift Cap Button */}
             <button
               onClick={handleAddToPlan}
-              className="flex-1 bg-[#a3e635] text-black font-black text-xs uppercase px-6 py-3.5 rounded-xl hover:bg-[#b5f846] transition text-center shadow-lg shadow-[#a3e635]/10"
+              disabled={plan.length >= 5}
+              className={`flex-1 font-black text-xs uppercase px-6 py-3.5 rounded-xl transition text-center ${
+                plan.length >= 5
+                  ? "bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700"
+                  : "bg-[#a3e635] text-black hover:bg-[#b5f846] shadow-lg shadow-[#a3e635]/10"
+              }`}
             >
-              + Add to today's plan
+              {plan.length >= 5 ? "Plan Full (Max 5 Lifts)" : "+ Add to today's plan"}
             </button>
+
             <button
               onClick={handleSaveForLater}
               className="flex-1 bg-[#181a20] border border-neutral-800 hover:border-neutral-700 text-white font-black text-xs uppercase px-6 py-3.5 rounded-xl transition text-center"

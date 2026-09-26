@@ -18,6 +18,10 @@ interface Workout {
 export default function HomePage() {
   const [workouts, setWorkouts] = useState<Workout[]>(WORKOUTS);
   const [loading, setLoading] = useState(true);
+  
+  // Search and Sort states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"duration" | "calories" | "rating">("duration");
 
   useEffect(() => {
     fetch("https://api.abcz.workers.dev/api/fitlog")
@@ -34,6 +38,27 @@ export default function HomePage() {
         setLoading(false);
       });
   }, []);
+
+  // 1. Filter workouts based on name or tags
+  const filteredWorkouts = workouts.filter((workout) => {
+    const matchesTitle = workout.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTag = workout.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesTitle || matchesTag;
+  });
+
+  // 2. Sort filtered workouts
+  const sortedAndFilteredWorkouts = [...filteredWorkouts].sort((a, b) => {
+    if (sortBy === "duration") {
+      return (parseInt(a.duration) || 0) - (parseInt(b.duration) || 0);
+    }
+    if (sortBy === "calories") {
+      return (parseInt(a.calories) || 0) - (parseInt(b.calories) || 0);
+    }
+    if (sortBy === "rating") {
+      return (b.rating || 0) - (a.rating || 0);
+    }
+    return 0;
+  });
 
   return (
     <main className="max-w-[1400px] mx-auto px-6 py-8">
@@ -71,13 +96,44 @@ export default function HomePage() {
 
       {/* Library Section */}
       <div id="library" className="pt-2">
-        <div className="mb-6">
-          <h2 className="text-2xl font-black text-white tracking-wide uppercase">
-            THE LIBRARY
-          </h2>
-          <p className="text-neutral-400 text-xs mt-1">
-            Twelve lifts covering every major muscle group.
-          </p>
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black text-white tracking-wide uppercase">
+              THE LIBRARY
+            </h2>
+            <p className="text-neutral-400 text-xs mt-1">
+              Twelve lifts covering every major muscle group.
+            </p>
+          </div>
+
+          {/* Controls: Search Bar & Sort Dropdown side by side */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search by name or tag (e.g. chest)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-[#111319] border border-neutral-800 text-white text-xs px-4 py-2.5 rounded-xl outline-none focus:border-neutral-700 w-full sm:w-64"
+            />
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-neutral-400 font-medium whitespace-nowrap">Sort By</span>
+              <div className="relative w-full sm:w-auto">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="bg-[#111319] border border-neutral-800/80 text-white text-xs font-bold rounded-xl px-3 py-2.5 pr-8 appearance-none outline-none cursor-pointer hover:border-neutral-700 transition w-full"
+                >
+                  <option value="duration">Duration</option>
+                  <option value="calories">Calories</option>
+                  <option value="rating">Rating</option>
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none text-xs">
+                  ▼
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Loading State Animation */}
@@ -88,9 +144,13 @@ export default function HomePage() {
               Loading workouts…
             </p>
           </div>
+        ) : sortedAndFilteredWorkouts.length === 0 ? (
+          <div className="border border-dashed border-neutral-800/80 rounded-xl p-16 text-center bg-[#0d0e12]">
+            <p className="text-neutral-400 text-xs uppercase font-bold">No matching workouts found</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workouts.map((workout) => (
+            {sortedAndFilteredWorkouts.map((workout) => (
               <Link
                 key={workout.id}
                 href={`/workout/${workout.id}`}
