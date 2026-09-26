@@ -1,163 +1,227 @@
 "use client";
-import { usePlan } from "@/context/PlanContext";
-import Image from "next/image";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { usePlan } from "@/context/PlanContext";
 
 export default function MyPlanPage() {
-  const { plan, saved, removeFromPlan, removeFromSaved, toggleDone } = usePlan();
+  const { plan, saved, removeFromPlan, toggleSaved } = usePlan();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState<"plan" | "saved">("plan");
+
+  useEffect(() => {
+    if (tabParam === "saved") {
+      setActiveTab("saved");
+    } else {
+      setActiveTab("plan");
+    }
+  }, [tabParam]);
+
+  const [sortBy, setSortBy] = useState<"duration" | "calories" | "title">("duration");
+  const [completedIds, setCompletedIds] = useState<string[]>([]);
+
+  const currentItems = activeTab === "plan" ? plan : saved;
+
+  const toggleComplete = (id: string) => {
+    setCompletedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleRemove = (workout: any) => {
+    if (activeTab === "plan") {
+      removeFromPlan(workout.id);
+    } else {
+      toggleSaved(workout);
+    }
+  };
+
+  // Metrics
+  const totalExercises = plan.length;
+  const totalMinutes = plan.reduce((acc, item) => {
+    const mins = parseInt(item.duration) || 0;
+    return acc + mins;
+  }, 0);
+  const totalCalories = plan.reduce((acc, item) => {
+    const cals = parseInt(item.calories) || 0;
+    return acc + cals;
+  }, 0);
+
+  // Sorting
+  const sortedItems = [...currentItems].sort((a, b) => {
+    if (sortBy === "duration") {
+      return (parseInt(a.duration) || 0) - (parseInt(b.duration) || 0);
+    }
+    if (sortBy === "calories") {
+      return (parseInt(a.calories) || 0) - (parseInt(b.calories) || 0);
+    }
+    return a.title.localeCompare(b.title);
+  });
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Header */}
-      <section className="mb-10 border-b border-neutral-800 pb-8">
-        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-white mb-2">
-          MY <span className="text-[#ccff00]">SESSION</span> &amp; SAVED
-        </h1>
-        <p className="text-neutral-400 text-sm max-w-xl">
-          Manage today&apos;s active workouts or review exercises saved for later.
-        </p>
-      </section>
+    <main className="max-w-[1200px] mx-auto px-6 py-10 min-h-[calc(100vh-140px)] flex flex-col justify-between">
+      <div>
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black text-white tracking-wider uppercase">
+            MY PLAN
+          </h1>
+          <p className="text-neutral-400 text-sm mt-1">
+            Cap of five lifts for today. Finish them, then load more.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Today's Plan Column */}
-        <div>
-          <div className="flex items-center justify-between mb-6 border-b border-neutral-800 pb-3">
-            <h2 className="text-2xl font-black uppercase text-white flex items-center gap-2">
-              <span className="text-[#ccff00]">⚡</span> Today&apos;s Plan
-            </h2>
-            <span className="bg-[#ccff00] text-black font-extrabold text-xs px-3 py-1 rounded-full">
-              {plan.length} / 5 Max
-            </span>
+        {/* Metric Cards Banner */}
+        <div className="bg-[#111319] border border-neutral-800/60 rounded-xl p-8 mb-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <p className="text-xs font-semibold text-neutral-400 mb-1">Exercises</p>
+            <p className="text-4xl font-black text-[#a3e635]">{totalExercises}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-400 mb-1">Minutes</p>
+            <p className="text-4xl font-black text-white">{totalMinutes}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-400 mb-1">Calories</p>
+            <p className="text-4xl font-black text-white">{totalCalories}</p>
+          </div>
+        </div>
+
+        {/* Tab & Sorting Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+          <div className="inline-flex bg-[#111319] p-1 rounded-lg border border-neutral-800/60 self-start">
+            <button
+              onClick={() => setActiveTab("plan")}
+              className={`px-5 py-2 text-xs font-bold rounded-md transition ${
+                activeTab === "plan"
+                  ? "bg-[#1d212b] text-white shadow-sm"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Today's Plan
+            </button>
+            <button
+              onClick={() => setActiveTab("saved")}
+              className={`px-5 py-2 text-xs font-bold rounded-md transition ${
+                activeTab === "saved"
+                  ? "bg-[#1d212b] text-white shadow-sm"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Saved
+            </button>
           </div>
 
-          {plan.length === 0 ? (
-            <div className="bg-neutral-900/40 border border-dashed border-neutral-800 rounded-xl p-8 text-center">
-              <p className="text-neutral-400 text-sm mb-4">
-                No exercises added to today&apos;s routine yet.
-              </p>
-              <Link
-                href="/"
-                className="inline-block bg-[#ccff00] text-black font-bold text-xs px-4 py-2 rounded-lg hover:bg-lime-400 transition"
-              >
-                Browse Exercises
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {plan.map((item) => (
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <span className="text-xs text-neutral-400 font-medium">Sort By</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-[#111319] border border-neutral-800/80 text-white text-xs font-bold rounded-lg px-3 py-2 outline-none cursor-pointer hover:border-neutral-700 transition"
+            >
+              <option value="duration">Duration</option>
+              <option value="calories">Calories</option>
+              <option value="title">Name</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Workout List Section */}
+        {sortedItems.length === 0 ? (
+          <div className="border border-dashed border-neutral-800/80 rounded-xl p-16 md:p-24 text-center bg-[#0d0e12]">
+            <h2 className="text-2xl font-black text-white tracking-wider uppercase mb-2">
+              NOTHING HERE YET
+            </h2>
+            <p className="text-neutral-400 text-xs mb-6 max-w-sm mx-auto">
+              {activeTab === "plan"
+                ? "Browse the library and add a lift to get today moving."
+                : "Browse the library and save lifts for quick access later."}
+            </p>
+            <Link
+              href="/"
+              className="inline-block bg-[#a3e635] text-black font-extrabold text-xs uppercase px-6 py-3 rounded-full hover:bg-[#b5f846] transition shadow-lg shadow-[#a3e635]/10"
+            >
+              Go to workouts
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {sortedItems.map((workout) => {
+              const isDone = completedIds.includes(workout.id);
+
+              return (
                 <div
-                  key={item.id}
-                  className={`bg-neutral-900/80 border ${
-                    item.done ? "border-emerald-500/50 opacity-70" : "border-neutral-800"
-                  } rounded-xl p-4 flex items-center gap-4 transition`}
+                  key={workout.id}
+                  className={`bg-[#111319] border border-neutral-800/80 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition ${
+                    isDone && activeTab === "plan" ? "opacity-60" : ""
+                  }`}
                 >
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-800">
-                    {item.image && (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        unoptimized
-                        className="object-cover"
+                  {/* Left Side: Image & Meta */}
+                  <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="relative aspect-[16/10] w-28 md:w-36 rounded-xl overflow-hidden bg-neutral-900 shrink-0">
+                      <img
+                        src={workout.image}
+                        alt={workout.title}
+                        className="w-full h-full object-cover"
                       />
+                    </div>
+
+                    <div>
+                      <h3 className="font-black text-white text-base md:text-lg tracking-wide uppercase">
+                        {workout.title}
+                      </h3>
+                      <p className="text-neutral-400 text-xs mt-0.5">
+                        {workout.equipment}
+                      </p>
+
+                      <div className="flex items-center gap-3 text-xs text-neutral-400 font-medium mt-2">
+                        <span>⏱ {workout.duration}</span>
+                        <span>🔥 {workout.calories}</span>
+                        <span>⭐ {workout.rating}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Side Actions */}
+                  <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <Link
+                      href={`/workout/${workout.id}`}
+                      className="px-5 py-2.5 bg-[#181a20] border border-neutral-800 hover:border-neutral-700 text-white font-bold text-xs uppercase rounded-full transition"
+                    >
+                      View Details
+                    </Link>
+
+                    {/* Show Mark as Done only on Today's Plan tab */}
+                    {activeTab === "plan" && (
+                      <button
+                        onClick={() => toggleComplete(workout.id)}
+                        className={`px-5 py-2.5 font-bold text-xs uppercase rounded-full transition flex items-center gap-1.5 ${
+                          isDone
+                            ? "bg-neutral-800 text-neutral-400 border border-neutral-700"
+                            : "bg-[#a3e635] text-black hover:bg-[#b5f846]"
+                        }`}
+                      >
+                        ✓ {isDone ? "Completed" : "Mark as Done"}
+                      </button>
                     )}
-                  </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h3
-                      className={`font-bold text-sm ${
-                        item.done ? "line-through text-neutral-400" : "text-white"
-                      }`}
-                    >
-                      {item.name}
-                    </h3>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      {item.equipment} &bull; {item.duration}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => toggleDone(item.id)}
-                      className={`text-xs px-3 py-1.5 rounded-md font-bold transition ${
-                        item.done
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                          : "bg-neutral-800 text-neutral-300 hover:text-white"
-                      }`}
-                    >
-                      {item.done ? "Done ✓" : "Mark Done"}
-                    </button>
-                    <button
-                      onClick={() => removeFromPlan(item.id)}
-                      className="text-xs text-rose-400 hover:text-rose-300 px-2 py-1.5 transition"
+                      onClick={() => handleRemove(workout)}
+                      className="text-neutral-500 hover:text-white p-2 text-sm transition"
+                      title="Remove"
                     >
                       ✕
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Saved Items Column */}
-        <div>
-          <div className="flex items-center justify-between mb-6 border-b border-neutral-800 pb-3">
-            <h2 className="text-2xl font-black uppercase text-white flex items-center gap-2">
-              <span className="text-neutral-400">🔖</span> Saved for Later
-            </h2>
-            <span className="bg-neutral-800 text-neutral-300 font-bold text-xs px-3 py-1 rounded-full border border-neutral-700">
-              {saved.length} Saved
-            </span>
+              );
+            })}
           </div>
-
-          {saved.length === 0 ? (
-            <div className="bg-neutral-900/40 border border-dashed border-neutral-800 rounded-xl p-8 text-center">
-              <p className="text-neutral-400 text-sm">
-                No workouts saved for later.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {saved.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-neutral-900/80 border border-neutral-800 rounded-xl p-4 flex items-center justify-between gap-4"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-neutral-800 flex-shrink-0">
-                      {item.image && (
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="truncate">
-                      <h3 className="font-bold text-sm text-white truncate">
-                        {item.name}
-                      </h3>
-                      <p className="text-xs text-neutral-500">
-                        {item.difficulty}
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => removeFromSaved(item.id)}
-                    className="text-xs text-neutral-400 hover:text-rose-400 transition"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
-    </div>
+    </main>
   );
 }

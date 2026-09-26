@@ -1,104 +1,95 @@
 "use client";
-import { useState } from "react";
+
+import Link from "next/link";
 import { WORKOUTS } from "@/data/workouts";
-import { usePlan } from "@/context/PlanContext";
 
 export default function HomePage() {
-  const [search, setSearch] = useState("");
-  const [selectedCat, setSelectedCat] = useState("All");
-  const { addToPlan, addToSaved } = usePlan();
-
-  const categories = ["All", "Chest", "Back", "Legs", "Upper Body", "Strength"];
-
-  const filteredWorkouts = WORKOUTS.filter((w) => {
-    const matchesSearch = w.name.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory =
-      selectedCat === "All" || w.category.includes(selectedCat);
-    return matchesSearch && matchesCategory;
-  });
-
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Hero Header */}
-      <section className="mb-10 text-center md:text-left border-b border-neutral-800 pb-8">
-        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white mb-2">
-          BUILD YOUR <span className="text-[#ccff00]">SESSION</span>
-        </h1>
-        <p className="text-neutral-400 text-sm md:text-base max-w-xl">
-          Browse compound movements, filter by target muscle groups, and customize today's training regimen.
-        </p>
-      </section>
-
-      {/* Filter & Search Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-8">
-        <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCat(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase transition ${
-                selectedCat === cat
-                  ? "bg-[#ccff00] text-black"
-                  : "bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800"
-              }`}
+    <main className="max-w-[1400px] mx-auto px-6 py-8">
+      {/* Hero Section matching your design */}
+      <section className="bg-[#111319] border border-neutral-800/80 rounded-2xl p-8 md:p-12 mb-12 flex flex-col lg:flex-row items-center justify-between gap-8">
+        <div className="max-w-xl">
+          <span className="text-[#a3e635] text-xs font-black uppercase tracking-wider block mb-3">
+            WORKOUT LIBRARY
+          </span>
+          <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-wider leading-[1.1]">
+            TRAIN WITH INTENT. <br />
+            LOG EVERY SET.
+          </h1>
+          <p className="text-neutral-400 text-sm mt-4 leading-relaxed max-w-md">
+            FitLog is a dark, no-nonsense gym companion: pick a lift, lock it into today's plan, and watch the week's work add up.
+          </p>
+          <div className="mt-6">
+            <a
+              href="#library"
+              className="inline-block bg-[#a3e635] text-black font-extrabold text-xs uppercase px-6 py-3 rounded-md hover:bg-[#b5f846] transition shadow-lg shadow-[#a3e635]/10"
             >
-              {cat}
-            </button>
-          ))}
+              BROWSE WORKOUTS
+            </a>
+          </div>
         </div>
 
-        <input
-          type="text"
-          placeholder="Search exercise..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full md:w-64 bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-2 text-xs text-white focus:outline-none focus:border-[#ccff00]"
-        />
-      </div>
+        <div className="relative w-full lg:w-[420px] aspect-[4/3] rounded-xl overflow-hidden flex items-center justify-center">
+          <img
+            src="/resources/banner 1.png"
+            alt="Workout Banner"
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </section>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredWorkouts.map((workout) => (
-          <div
-            key={workout.id}
-            className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden flex flex-col justify-between hover:border-neutral-700 transition"
-          >
-            <div>
-              <div className="h-48 overflow-hidden relative">
+      {/* Library Section */}
+      <div id="library" className="pt-2">
+        <h2 className="text-2xl font-black text-white tracking-wide uppercase mb-6">
+          THE LIBRARY
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {WORKOUTS.map((workout) => (
+            <Link
+              key={workout.id}
+              href={`/workout/${workout.id}`}
+              className="group bg-[#111319] border border-neutral-800/80 rounded-xl overflow-hidden hover:border-neutral-700 transition flex flex-col cursor-pointer"
+            >
+              <div className="relative aspect-[16/10] w-full bg-neutral-900 overflow-hidden">
                 <img
                   src={workout.image}
-                  alt={workout.name}
-                  className="w-full h-full object-cover"
+                  alt={workout.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                 />
-                <span className="absolute top-3 right-3 bg-black/80 backdrop-blur-md border border-neutral-700 text-[#ccff00] font-bold text-[10px] px-2.5 py-1 rounded-md uppercase">
-                  {workout.difficulty}
-                </span>
               </div>
-              <div className="p-5">
-                <h3 className="text-xl font-bold text-white mb-2">{workout.name}</h3>
-                <p className="text-neutral-400 text-xs line-clamp-2 mb-4">
-                  {workout.description}
-                </p>
-              </div>
-            </div>
 
-            <div className="px-5 pb-5 pt-0 flex gap-2">
-              <button
-                onClick={() => addToPlan(workout)}
-                className="flex-1 bg-[#ccff00] hover:bg-lime-400 text-black font-extrabold text-xs py-2.5 rounded-lg transition"
-              >
-                + ADD TO PLAN
-              </button>
-              <button
-                onClick={() => addToSaved(workout)}
-                className="bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs px-3 rounded-lg transition border border-neutral-700"
-              >
-                SAVE
-              </button>
-            </div>
-          </div>
-        ))}
+              <div className="p-5 flex flex-col justify-between flex-grow">
+                <div>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {workout.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-[#a3e635] text-black text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <h3 className="font-black text-white text-base tracking-wide uppercase group-hover:text-[#a3e635] transition">
+                    {workout.title}
+                  </h3>
+                  <p className="text-neutral-400 text-xs mt-1">
+                    {workout.equipment}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-neutral-400 pt-4 mt-4 border-t border-neutral-800/60 font-medium">
+                  <span>⏱ {workout.duration}</span>
+                  <span>🔥 {workout.calories}</span>
+                  <span>⭐ {workout.rating}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -5,46 +5,64 @@ import { usePlan } from "@/context/PlanContext";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { plan, saved } = usePlan();
+  const { plan } = usePlan();
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#0d0e12]/90 backdrop-blur-md border-b border-neutral-800 px-6 py-4 flex items-center justify-between">
-      {/* Brand Logo */}
-      <Link href="/" className="flex items-center gap-2 font-black text-xl tracking-wider text-white">
-        <span className="text-[#ccff00]">⚡</span> FITLOG
-      </Link>
+    <header className="w-full bg-[#0a0a0c] border-b border-neutral-900 sticky top-0 z-50">
+      <div className="max-w-[1600px] mx-auto px-8 h-16 flex items-center justify-between relative">
+        {/* Left: Brand Logo & Title */}
+        <Link href="/" className="flex items-center gap-3">
+          <img
+            src="/resources/logo.png"
+            alt="FitLog Logo"
+            className="h-6 w-auto object-contain"
+          />
+          <span className="font-black text-white text-lg tracking-wider uppercase">
+            FITLOG
+          </span>
+        </Link>
 
-      {/* Navigation Links */}
-      <div className="flex items-center gap-8 font-semibold uppercase tracking-wider text-xs">
-        <Link
-          href="/"
-          className={pathname === "/" ? "text-[#ccff00] border-b-2 border-[#ccff00] pb-1" : "text-neutral-400 hover:text-white transition"}
-        >
-          Workout
-        </Link>
-        <Link
-          href="/my-plan"
-          className={pathname === "/my-plan" ? "text-[#ccff00] border-b-2 border-[#ccff00] pb-1" : "text-neutral-400 hover:text-white transition"}
-        >
-          My Plan
-        </Link>
-      </div>
+        {/* Center: Pill Navigation Tabs */}
+        <nav className="absolute left-1/2 -translate-x-1/2 flex items-center bg-[#111318] p-1 rounded-full border border-neutral-800/80">
+          <Link
+            href="/"
+            className={`px-5 py-1.5 rounded-full text-xs font-bold transition ${
+              pathname === "/"
+                ? "bg-[#1f290d] text-[#a3e635]"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
+            Workouts
+          </Link>
+          <Link
+            href="/my-plan"
+            className={`px-5 py-1.5 rounded-full text-xs font-bold transition ${
+              pathname === "/my-plan"
+                ? "bg-[#1f290d] text-[#a3e635]"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
+            My Plan
+          </Link>
+        </nav>
 
-      {/* Badges */}
-      <div className="flex items-center gap-3">
-        <Link
-          href="/my-plan"
-          className="bg-[#ccff00] text-black font-extrabold px-3.5 py-1.5 rounded-full text-xs flex items-center gap-2 hover:bg-lime-400 transition"
-        >
-          Plan <span className="bg-black text-white px-2 py-0.5 rounded-full text-[10px]">{plan.length}</span>
-        </Link>
-        <Link
-          href="/my-plan"
-          className="border border-neutral-700 text-neutral-300 font-semibold px-3.5 py-1.5 rounded-full text-xs flex items-center gap-2 hover:border-neutral-400 transition"
-        >
-          Saved <span className="bg-neutral-800 text-white px-2 py-0.5 rounded-full text-[10px]">{saved.length}</span>
-        </Link>
+        {/* Right: Counter Badges */}
+        <div className="flex items-center gap-4 text-xs font-medium text-neutral-300">
+          <div className="flex items-center gap-2">
+            <span>Plan</span>
+            <span className="bg-[#a3e635] text-black font-extrabold text-[11px] px-2 py-0.5 rounded-full min-w-[20px] text-center">
+              {plan?.length || 0}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span>Saved</span>
+            <span className="bg-[#181a20] text-neutral-300 border border-neutral-700 font-extrabold text-[11px] px-2 py-0.5 rounded-full min-w-[20px] text-center">
+              0
+            </span>
+          </div>
+        </div>
       </div>
-    </nav>
+    </header>
   );
 }
