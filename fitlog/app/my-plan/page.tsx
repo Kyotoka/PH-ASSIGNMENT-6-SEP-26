@@ -20,22 +20,36 @@ export default function MyPlanPage() {
     }
   }, [tabParam]);
 
-  const [sortBy, setSortBy] = useState<"duration" | "calories" | "title">("duration");
+  const [sortBy, setSortBy] = useState<"duration" | "calories" | "rating">("duration");
   const [completedIds, setCompletedIds] = useState<string[]>([]);
+  const [toast, setToast] = useState<string | null>(null);
 
   const currentItems = activeTab === "plan" ? plan : saved;
 
+  const triggerToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const toggleComplete = (id: string) => {
-    setCompletedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setCompletedIds((prev) => {
+      const isDone = prev.includes(id);
+      if (isDone) {
+        return prev.filter((item) => item !== id);
+      } else {
+        triggerToast("Workout marked as done!");
+        return [...prev, id];
+      }
+    });
   };
 
   const handleRemove = (workout: any) => {
     if (activeTab === "plan") {
       removeFromPlan(workout.id);
+      triggerToast("Removed from today's plan");
     } else {
       toggleSaved(workout);
+      triggerToast("Removed from saved list");
     }
   };
 
@@ -50,7 +64,7 @@ export default function MyPlanPage() {
     return acc + cals;
   }, 0);
 
-  // Sorting
+  // Sorting functionality (Duration, Calories, Rating)
   const sortedItems = [...currentItems].sort((a, b) => {
     if (sortBy === "duration") {
       return (parseInt(a.duration) || 0) - (parseInt(b.duration) || 0);
@@ -58,11 +72,21 @@ export default function MyPlanPage() {
     if (sortBy === "calories") {
       return (parseInt(a.calories) || 0) - (parseInt(b.calories) || 0);
     }
-    return a.title.localeCompare(b.title);
+    if (sortBy === "rating") {
+      return (b.rating || 0) - (a.rating || 0);
+    }
+    return 0;
   });
 
   return (
-    <main className="max-w-[1200px] mx-auto px-6 py-10 min-h-[calc(100vh-140px)] flex flex-col justify-between">
+    <main className="max-w-[1200px] mx-auto px-6 py-10 min-h-[calc(100vh-140px)] flex flex-col justify-between relative">
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#a3e635] text-black text-xs font-black uppercase px-5 py-3 rounded-xl shadow-2xl shadow-[#a3e635]/20 animate-bounce">
+          ✓ {toast}
+        </div>
+      )}
+
       <div>
         {/* Header Section */}
         <div className="mb-8">
@@ -115,17 +139,23 @@ export default function MyPlanPage() {
             </button>
           </div>
 
+          {/* Sort By Dropdown with Chevron Icon */}
           <div className="flex items-center gap-2 self-end sm:self-auto">
             <span className="text-xs text-neutral-400 font-medium">Sort By</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[#111319] border border-neutral-800/80 text-white text-xs font-bold rounded-lg px-3 py-2 outline-none cursor-pointer hover:border-neutral-700 transition"
-            >
-              <option value="duration">Duration</option>
-              <option value="calories">Calories</option>
-              <option value="title">Name</option>
-            </select>
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-[#111319] border border-neutral-800/80 text-white text-xs font-bold rounded-lg px-3 py-2 pr-8 appearance-none outline-none cursor-pointer hover:border-neutral-700 transition"
+              >
+                <option value="duration">Duration</option>
+                <option value="calories">Calories</option>
+                <option value="rating">Rating</option>
+              </select>
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none text-xs">
+                ▼
+              </span>
+            </div>
           </div>
         </div>
 
