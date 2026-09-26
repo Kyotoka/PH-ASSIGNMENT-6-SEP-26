@@ -9,7 +9,7 @@ export interface Workout {
   tags: string[];
   duration: string;
   calories: string;
-  rating: string;
+  rating: number;
   image: string;
   instructions: string[];
 }
@@ -26,7 +26,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Chest", "Arms"],
     duration: "25 min",
     calories: "180 kcal",
-    rating: "4.8",
+    rating: 4.8,
     image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Lie on the bench with eyes under the bar and feet planted.",
@@ -46,7 +46,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Back", "Arms"],
     duration: "15 min",
     calories: "120 kcal",
-    rating: "4.7",
+    rating: 4.7,
     image: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Grasp the bar with an overhand grip slightly wider than shoulder-width.",
@@ -66,7 +66,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Legs", "Core"],
     duration: "30 min",
     calories: "240 kcal",
-    rating: "4.8",
+    rating: 4.8,
     image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Position the barbell across your upper trapezius and unrack.",
@@ -86,7 +86,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Shoulders", "Arms"],
     duration: "20 min",
     calories: "150 kcal",
-    rating: "4.6",
+    rating: 4.6,
     image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Hold the bar at collarbone height with hands shoulder-width apart.",
@@ -106,7 +106,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Arms"],
     duration: "12 min",
     calories: "80 kcal",
-    rating: "4.9",
+    rating: 4.9,
     image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Stand tall holding dumbbells at your sides with palms facing forward.",
@@ -126,7 +126,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Arms"],
     duration: "12 min",
     calories: "85 kcal",
-    rating: "4.8",
+    rating: 4.8,
     image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Hold dumbbells at your sides with palms facing inward toward each other.",
@@ -146,7 +146,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Core"],
     duration: "10 min",
     calories: "60 kcal",
-    rating: "4.4",
+    rating: 4.4,
     image: "https://images.unsplash.com/photo-1566241142559-40e1dab266c6?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Place forearms on the floor with elbows directly under shoulders.",
@@ -166,7 +166,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Chest", "Shoulders"],
     duration: "22 min",
     calories: "170 kcal",
-    rating: "4.7",
+    rating: 4.7,
     image: "https://images.unsplash.com/photo-1534367507873-d2d7e24c797f?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Set bench to 30-45 degree incline and lie back firmly.",
@@ -186,7 +186,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Back", "Legs"],
     duration: "28 min",
     calories: "260 kcal",
-    rating: "4.9",
+    rating: 4.9,
     image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Stand with feet hip-width apart and bar over mid-foot.",
@@ -206,7 +206,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Chest", "Arms", "Core"],
     duration: "12 min",
     calories: "90 kcal",
-    rating: "4.5",
+    rating: 4.5,
     image: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Place hands slightly wider than shoulder-width in high plank position.",
@@ -226,7 +226,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Legs"],
     duration: "18 min",
     calories: "170 kcal",
-    rating: "4.4",
+    rating: 4.4,
     image: "https://images.unsplash.com/photo-1434608519344-49d77a699e1d?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Step forward with right foot and lower back knee toward floor.",
@@ -246,7 +246,7 @@ export const WORKOUTS: Workout[] = [
     tags: ["Core"],
     duration: "10 min",
     calories: "70 kcal",
-    rating: "4.3",
+    rating: 4.3,
     image: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=800&q=80",
     instructions: [
       "Sit on floor with knees bent and heels slightly elevated.",
