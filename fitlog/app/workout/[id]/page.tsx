@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { WORKOUTS } from "@/data/workouts";
 import { usePlan } from "@/context/PlanContext";
 
 export default function WorkoutDetailPage() {
   const params = useParams();
-  const router = useRouter();
-  const { addToPlan, toggleSaved, plan, saved } = usePlan();
+  const { addToPlan, toggleSaved, plan } = usePlan();
 
   const [toast, setToast] = useState<string | null>(null);
 
@@ -18,7 +18,7 @@ export default function WorkoutDetailPage() {
 
   if (!workout) {
     return (
-      <div className="max-w-[1200px] mx-auto px-6 py-24 text-center">
+      <div className="max-w-300 mx-auto px-6 py-24 text-center">
         <h2 className="text-2xl font-black text-white uppercase mb-4">Workout Not Found</h2>
         <Link href="/" className="text-xs font-bold text-[#a3e635] underline">
           Back to Library
@@ -50,7 +50,7 @@ export default function WorkoutDetailPage() {
   };
 
   return (
-    <main className="max-w-[1200px] mx-auto px-6 py-10 relative">
+    <main className="max-w-300 mx-auto px-6 py-10 relative">
       {/* Toast Notification Banner */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#a3e635] text-black text-xs font-black uppercase px-5 py-3 rounded-xl shadow-2xl shadow-[#a3e635]/20 animate-bounce">
@@ -65,8 +65,14 @@ export default function WorkoutDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-4">
         {/* Left Side: Image */}
-        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-900 border border-neutral-800">
-          <img src={workout.image} alt={workout.title} className="w-full h-full object-cover" />
+        <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-neutral-900 border border-neutral-800">
+          <Image
+            src={workout.image}
+            alt={workout.title}
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+          />
         </div>
 
         {/* Right Side: Details & Actions */}

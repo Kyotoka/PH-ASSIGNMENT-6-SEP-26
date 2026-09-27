@@ -15,7 +15,7 @@ function Navbar() {
 
   return (
     <header className="bg-[#0b0c10] border-b border-neutral-900 sticky top-0 z-50 px-6 py-4">
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+      <div className="max-w-350 mx-auto flex items-center justify-between">
         {/* Left: Brand Logo using logo.png */}
         <Link href="/" className="flex items-center gap-2.5">
           <Image
@@ -79,7 +79,7 @@ function Navbar() {
 function Footer() {
   return (
     <footer className="border-t border-neutral-900 bg-[#0b0c10] py-6 px-6">
-      <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+      <div className="max-w-350 mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
         {/* Left: Footer Logo using vector.png */}
         <Link href="/" className="flex items-center gap-2.5">
           <Image

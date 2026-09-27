@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { WORKOUTS } from "@/data/workouts";
 
 export default function WorkoutLibrary() {
@@ -23,9 +24,11 @@ export default function WorkoutLibrary() {
           >
             {/* Image Container */}
             <div className="relative w-full h-48 bg-neutral-900 overflow-hidden">
-              <img
+              <Image
                 src={item.image}
                 alt={item.title}
+                width={800}
+                height={400}
                 className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
               />
             </div>

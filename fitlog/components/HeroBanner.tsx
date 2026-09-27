@@ -16,7 +16,7 @@ export default function HeroBanner() {
 
         <p className="text-neutral-400 text-sm md:text-base leading-relaxed">
           FitLog is a dark, no-nonsense gym companion: pick a lift, lock it
-          into today's plan, and watch the week's work add up.
+          into today&apos;s plan, and watch the week&apos;s work add up.
         </p>
 
         <div>
@@ -27,7 +27,7 @@ export default function HeroBanner() {
       </div>
 
       {/* Right Graphic / Image */}
-      <div className="relative w-full max-w-[320px] md:max-w-[380px] h-[280px] md:h-[340px] flex-shrink-0 flex items-center justify-center">
+      <div className="relative w-full max-w-[320px] md:max-w-95 h-70 md:h-85 shrink-0 flex items-center justify-center">
         <Image
           src="/resources/banner 1.png"
           alt="Preacher Curl Gym Equipment Graphic"

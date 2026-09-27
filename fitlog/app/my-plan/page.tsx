@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { usePlan } from "@/context/PlanContext";
 
@@ -10,15 +11,9 @@ function MyPlanContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
 
-  const [activeTab, setActiveTab] = useState<"plan" | "saved">("plan");
-
-  useEffect(() => {
-    if (tabParam === "saved") {
-      setActiveTab("saved");
-    } else {
-      setActiveTab("plan");
-    }
-  }, [tabParam]);
+  const [activeTab, setActiveTab] = useState<"plan" | "saved">(
+    tabParam === "saved" ? "saved" : "plan"
+  );
 
   const [sortBy, setSortBy] = useState<"duration" | "calories" | "rating">("duration");
   const [completedIds, setCompletedIds] = useState<string[]>([]);
@@ -43,7 +38,7 @@ function MyPlanContent() {
     });
   };
 
-  const handleRemove = (workout: any) => {
+  const handleRemove = (workout: (typeof plan)[number]) => {
     if (activeTab === "plan") {
       removeFromPlan(workout.id);
       triggerToast("Removed from today's plan");
@@ -79,7 +74,7 @@ function MyPlanContent() {
   });
 
   return (
-    <main className="max-w-[1200px] mx-auto px-6 py-10 min-h-[calc(100vh-140px)] flex flex-col justify-between relative">
+    <main className="max-w-300 mx-auto px-6 py-10 min-h-[calc(100vh-140px)] flex flex-col justify-between relative">
       {/* Toast Notification */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#a3e635] text-black text-xs font-black uppercase px-5 py-3 rounded-xl shadow-2xl shadow-[#a3e635]/20 animate-bounce">
@@ -125,7 +120,7 @@ function MyPlanContent() {
                   : "text-neutral-400 hover:text-white"
               }`}
             >
-              Today's Plan
+              Today&apos;s Plan
             </button>
             <button
               onClick={() => setActiveTab("saved")}
@@ -145,7 +140,9 @@ function MyPlanContent() {
             <div className="relative">
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) =>
+                  setSortBy(e.target.value as "duration" | "calories" | "rating")
+                }
                 className="bg-[#111319] border border-neutral-800/80 text-white text-xs font-bold rounded-lg px-3 py-2 pr-8 appearance-none outline-none cursor-pointer hover:border-neutral-700 transition"
               >
                 <option value="duration">Duration</option>
@@ -191,10 +188,12 @@ function MyPlanContent() {
                 >
                   {/* Left Side: Image & Meta */}
                   <div className="flex items-center gap-4 w-full md:w-auto">
-                    <div className="relative aspect-[16/10] w-28 md:w-36 rounded-xl overflow-hidden bg-neutral-900 shrink-0">
-                      <img
+                    <div className="relative aspect-16/10 w-28 md:w-36 rounded-xl overflow-hidden bg-neutral-900 shrink-0">
+                      <Image
                         src={workout.image}
                         alt={workout.title}
+                        width={144}
+                        height={90}
                         className="w-full h-full object-cover"
                       />
                     </div>

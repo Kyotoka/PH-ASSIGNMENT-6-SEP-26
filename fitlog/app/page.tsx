@@ -1,48 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useState } from "react";
 import Link from "next/link";
 import { WORKOUTS } from "@/data/workouts";
 
 interface Workout {
   id: string;
   title: string;
-  image: string;
-  tags: string[];
+  description: string;
   equipment: string;
+  difficulty: string;
+  sets: number;
+  reps: string;
+  tags: string[];
   duration: string;
   calories: string;
   rating: number;
+  image: string;
+  instructions: string[];
 }
 
 export default function HomePage() {
-  const [workouts, setWorkouts] = useState<Workout[]>(WORKOUTS);
-  const [loading, setLoading] = useState(true);
+  // Initialize directly with your local workouts so they load instantly and reliably
+  const [workouts] = useState<Workout[]>(WORKOUTS);
+  const [loading] = useState(false);
   
   // Search and Sort states
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"duration" | "calories" | "rating">("duration");
 
-  useEffect(() => {
-    fetch("https://api.abcz.workers.dev/api/fitlog")
-      .then((res) => res.json())
-      .then((data) => {
-        const items = Array.isArray(data) ? data : data.workouts || data.data;
-        if (items && items.length > 0) {
-          setWorkouts(items);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch from API, using local fallback:", err);
-        setLoading(false);
-      });
-  }, []);
-
-  // 1. Filter workouts based on name or tags
+  // 1. Filter workouts safely with optional chaining
   const filteredWorkouts = workouts.filter((workout) => {
-    const matchesTitle = workout.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTag = workout.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesTitle = workout.title?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false;
+    const matchesTag = workout.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())) ?? false;
     return matchesTitle || matchesTag;
   });
 
@@ -61,7 +52,7 @@ export default function HomePage() {
   });
 
   return (
-    <main className="max-w-[1400px] mx-auto px-6 py-8">
+    <main className="max-w-350 mx-auto px-6 py-8">
       {/* Hero Section */}
       <section className="bg-[#111319] border border-neutral-800/80 rounded-2xl p-8 md:p-12 mb-12 flex flex-col lg:flex-row items-center justify-between gap-8">
         <div className="max-w-xl">
@@ -73,7 +64,7 @@ export default function HomePage() {
             LOG EVERY SET.
           </h1>
           <p className="text-neutral-400 text-sm mt-4 leading-relaxed max-w-md">
-            FitLog is a dark, no-nonsense gym companion: pick a lift, lock it into today's plan, and watch the week's work add up.
+            FitLog is a dark, no-nonsense gym companion: pick a lift, lock it into today&apos;s plan, and watch the week&apos;s work add up.
           </p>
           <div className="mt-6">
             <a
@@ -85,11 +76,15 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="relative w-full lg:w-[420px] aspect-[4/3] rounded-xl overflow-hidden flex items-center justify-center">
-          <img
+        <div className="relative w-full lg:w-105 aspect-4/3 rounded-xl overflow-hidden flex items-center justify-center">
+          <Image
             src="/resources/banner 1.png"
             alt="Workout Banner"
-            className="w-full h-full object-contain"
+            fill
+            unoptimized
+            priority
+            sizes="(max-width: 1024px) 100vw, 420px"
+            className="object-contain"
           />
         </div>
       </section>
@@ -121,7 +116,9 @@ export default function HomePage() {
               <div className="relative w-full sm:w-auto">
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
+                  onChange={(e) =>
+                    setSortBy(e.target.value as "duration" | "calories" | "rating")
+                  }
                   className="bg-[#111319] border border-neutral-800/80 text-white text-xs font-bold rounded-xl px-3 py-2.5 pr-8 appearance-none outline-none cursor-pointer hover:border-neutral-700 transition w-full"
                 >
                   <option value="duration">Duration</option>
@@ -146,7 +143,13 @@ export default function HomePage() {
           </div>
         ) : sortedAndFilteredWorkouts.length === 0 ? (
           <div className="border border-dashed border-neutral-800/80 rounded-xl p-16 text-center bg-[#0d0e12]">
-            <p className="text-neutral-400 text-xs uppercase font-bold">No matching workouts found</p>
+            <p className="text-neutral-400 text-xs uppercase font-bold mb-4">No matching workouts found</p>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="px-5 py-2.5 bg-[#a3e635] text-black font-extrabold text-xs uppercase rounded-full hover:bg-[#b5f846] transition"
+            >
+              Clear Search
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -156,15 +159,17 @@ export default function HomePage() {
                 href={`/workout/${workout.id}`}
                 className="group bg-[#111319] border border-neutral-800/80 rounded-xl overflow-hidden hover:border-neutral-700 transition flex flex-col cursor-pointer"
               >
-                <div className="relative aspect-[16/10] w-full bg-neutral-900 overflow-hidden">
-                  <img
+                <div className="relative aspect-16/10 w-full bg-neutral-900 overflow-hidden">
+                  <Image
                     src={workout.image}
-                    alt={workout.title}
+                    alt={workout.title || "Workout"}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
                 </div>
 
-                <div className="p-5 flex flex-col justify-between flex-grow">
+                <div className="p-5 flex flex-col justify-between grow">
                   <div>
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {workout.tags?.map((tag) => (
